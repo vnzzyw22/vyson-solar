@@ -23,9 +23,22 @@ npm run dev
 npm run build
 ```
 
+## Assets de marca
+
+A logo oficial está em `src/assets/logo-vysao/`:
+
+- `logo-vysao.jpg` — arquivo original enviado pelo cliente (com fundo).
+- `logo-icon-cutout.png` / `icon.webp` — símbolo do olho isolado, fundo removido (usado no nav,
+  rodapé e favicon). Gerado por remoção de fundo automática (luminância/saturação) a partir do
+  original — se a Vysão fornecer um arquivo com fundo já transparente no futuro, pode substituir
+  este diretamente.
+- `logo-full-cutout.png` — lockup completo (ícone + "VYSÃO SOLAR" + tagline), fundo removido,
+  mantido como fonte para uso futuro (ex: redes sociais, materiais impressos); não é usado no
+  site hoje porque o wordmark do site usa tipografia set (Sora), não o lettering do arquivo
+  original, por consistência com o resto da tipografia do site.
+
 ## Pendências antes de publicar
 
-- Substituir o símbolo do olho placeholder (`src/components/Logo.tsx`) pela logo real tratada.
 - Confirmar e preencher os números marcados como `(a confirmar)` em `src/content.ts`
   (contadores da seção Sobre e estatísticas dos Cases).
 - Trocar os logos de fornecedores placeholder na faixa de parceiros (`src/components/Partners.tsx`).

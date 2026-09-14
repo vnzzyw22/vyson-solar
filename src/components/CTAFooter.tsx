@@ -1,24 +1,18 @@
 import { motion } from 'framer-motion'
 import { Logo } from './Logo'
+import icon from '../assets/logo-vysao/icon.webp'
 import { CONTACT, NAV_LINKS, whatsappLink } from '../content'
 
 export function CTAFooter() {
   return (
     <footer className="relative overflow-hidden bg-navy">
-      <svg
-        viewBox="0 0 64 64"
-        className="pointer-events-none absolute -right-24 -top-24 h-[560px] w-[560px] opacity-[0.07] sm:-right-32 sm:-top-32 sm:h-[720px] sm:w-[720px]"
+      <img
+        src={icon}
+        alt=""
         aria-hidden="true"
-      >
-        <path
-          d="M6 33c6.5-12 16-19 26-19s19.5 7 26 19c-6.5 12-16 19-26 19S12.5 45 6 33Z"
-          fill="none"
-          stroke="#FFFDF0"
-          strokeWidth="1.4"
-        />
-        <circle cx="32" cy="33" r="11" fill="none" stroke="#FFFDF0" strokeWidth="1.4" />
-        <circle cx="32" cy="33" r="4.5" fill="#FFFDF0" />
-      </svg>
+        className="pointer-events-none absolute -right-16 -top-16 h-auto w-[620px] opacity-[0.08] sm:-right-20 sm:-top-20 sm:w-[820px]"
+        style={{ filter: 'brightness(0) invert(1)' }}
+      />
 
       <div className="relative px-4 pt-24 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-4xl text-center">
