@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { Logo } from './Logo'
 import icon from '../assets/logo-vysao/icon.webp'
 import { CONTACT, NAV_LINKS, whatsappLink } from '../content'
@@ -44,7 +45,7 @@ export function CTAFooter() {
               Simular economia agora
             </a>
             <a
-              href="#servicos"
+              href="/#servicos"
               className="text-sm font-semibold text-cream underline decoration-cream/40 underline-offset-4 transition-colors hover:decoration-cream sm:text-base"
             >
               Saiba mais
@@ -111,8 +112,11 @@ export function CTAFooter() {
           </div>
         </div>
 
-        <div className="relative border-t border-cream/10 py-6 text-center text-xs text-cream/35">
-          © {new Date().getFullYear()} Vysão Solar. Todos os direitos reservados.
+        <div className="relative flex flex-col items-center gap-2 border-t border-cream/10 py-6 text-center text-xs text-cream/35 sm:flex-row sm:justify-between">
+          <span>© {new Date().getFullYear()} Vysão Solar. Todos os direitos reservados.</span>
+          <Link to="/politica-de-privacidade" className="hover:text-cream/70">
+            Política de Privacidade
+          </Link>
         </div>
       </div>
     </footer>

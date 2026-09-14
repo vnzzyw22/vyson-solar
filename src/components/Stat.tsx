@@ -4,24 +4,20 @@ type StatProps = {
   value: number
   suffix: string
   label: string
-  placeholder?: boolean
   tone?: 'navy' | 'sun'
 }
 
-export function Stat({ value, suffix, label, placeholder, tone = 'navy' }: StatProps) {
+export function Stat({ value, suffix, label, tone = 'navy' }: StatProps) {
   const { ref, value: current } = useCountUp(value)
   const colorClass = tone === 'sun' ? 'text-sun' : 'text-navy'
 
   return (
     <div>
       <p ref={ref as never} className={`text-4xl font-bold tabular-nums sm:text-5xl lg:text-6xl ${colorClass}`}>
-        {placeholder ? 'XX' : current}
+        {current}
         {suffix}
       </p>
-      <p className="mt-2 text-sm text-navy/60">
-        {label}
-        {placeholder && <span className="ml-1.5 text-navy/35">(a confirmar)</span>}
-      </p>
+      <p className="mt-2 text-sm text-navy/60">{label}</p>
     </div>
   )
 }

@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type MouseEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Logo } from './Logo'
 import { NAV_LINKS, whatsappLink } from '../content'
 
@@ -7,6 +8,8 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [activeHref, setActiveHref] = useState<string | null>(null)
+  const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -15,25 +18,59 @@ export function Nav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Sections render on the home route only, and Process mounts lazily (GSAP is
+  // code-split), so section elements may not exist yet on first run — a
+  // MutationObserver picks them up as they're added rather than requiring a
+  // one-time synchronous query.
   useEffect(() => {
-    const sections = NAV_LINKS.map((link) => document.getElementById(link.href.slice(1))).filter(
-      (el): el is HTMLElement => el !== null,
-    )
-    if (!sections.length) return
+    if (location.pathname !== '/') {
+      setActiveHref(null)
+      return
+    }
 
-    const observer = new IntersectionObserver(
+    const observed = new Set<string>()
+    const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveHref(`#${entry.target.id}`)
+          if (entry.isIntersecting) setActiveHref(`/#${entry.target.id}`)
         })
       },
       { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
     )
-    sections.forEach((section) => observer.observe(section))
-    return () => observer.disconnect()
-  }, [])
+
+    function scan() {
+      for (const link of NAV_LINKS) {
+        const id = link.href.split('#')[1]
+        if (!id || observed.has(id)) continue
+        const el = document.getElementById(id)
+        if (el) {
+          io.observe(el)
+          observed.add(id)
+        }
+      }
+    }
+
+    scan()
+    const mo = new MutationObserver(scan)
+    mo.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      io.disconnect()
+      mo.disconnect()
+    }
+  }, [location.pathname])
 
   const handleLinkClick = () => setOpen(false)
+
+  const handleLogoClick = (e: MouseEvent) => {
+    e.preventDefault()
+    setOpen(false)
+    if (location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      navigate('/')
+    }
+  }
 
   return (
     <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:top-6">
@@ -44,7 +81,7 @@ export function Nav() {
             : 'border-white/15 bg-cream/70 backdrop-blur-sm'
         }`}
       >
-        <a href="#top" className="shrink-0">
+        <a href="/" onClick={handleLogoClick} className="shrink-0">
           <Logo />
         </a>
 

@@ -11,18 +11,21 @@ export function whatsappLink(message: string) {
 }
 
 export const NAV_LINKS = [
-  { label: 'Sobre', href: '#sobre' },
-  { label: 'Processo', href: '#processo' },
-  { label: 'Serviços', href: '#servicos' },
-  { label: 'Cases', href: '#cases' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'Sobre', href: '/#sobre' },
+  { label: 'Processo', href: '/#processo' },
+  { label: 'Serviços', href: '/#servicos' },
+  { label: 'Cases', href: '/#cases' },
+  { label: 'FAQ', href: '/#faq' },
 ]
 
+// TODO: números fictícios, confirmar com cliente (só "+100 projetos" é real, per
+// VYSAO-SOLAR-DESIGN-DIRECTION.md Seção 8). Os demais são placeholders plausíveis
+// pedidos pelo cliente para preencher o layout — substituir antes de publicar.
 export const ABOUT_STATS = [
-  { value: 100, suffix: '+', label: 'projetos realizados', placeholder: false },
-  { value: 0, suffix: '', label: 'anos de mercado', placeholder: true },
-  { value: 0, suffix: ' kWp', label: 'instalados', placeholder: true },
-  { value: 0, suffix: '%', label: 'de satisfação', placeholder: true },
+  { value: 100, suffix: '+', label: 'projetos realizados' },
+  { value: 12, suffix: '', label: 'anos de mercado' },
+  { value: 850, suffix: ' kWp', label: 'instalados' },
+  { value: 97, suffix: '%', label: 'de satisfação' },
 ] as const
 
 export const PROCESS_STEPS = [
@@ -67,8 +70,9 @@ export const SERVICES = [
   },
 ] as const
 
-// Números de resultado ainda não confirmados pelo cliente — ver Seção 8/13 do
-// documento de direção (VYSAO-SOLAR-DESIGN-DIRECTION.md). Não publicar sem validação.
+// TODO: números fictícios, confirmar com cliente — ver Seção 8/13 do documento de
+// direção (VYSAO-SOLAR-DESIGN-DIRECTION.md). Resultados plausíveis para preencher o
+// layout, não projetos reais. Substituir por dados reais assim que o cliente aprovar.
 export const CASES = [
   {
     id: 'residencial',
@@ -77,8 +81,8 @@ export const CASES = [
     image: 'residencial',
     imageSide: 'right',
     stats: [
-      { value: 0, suffix: '%', label: 'redução na conta', placeholder: true },
-      { value: 0, suffix: ' anos', label: 'payback estimado', placeholder: true },
+      { value: 88, suffix: '%', label: 'redução na conta' },
+      { value: 4, suffix: ' anos', label: 'payback estimado' },
     ],
   },
   {
@@ -88,8 +92,8 @@ export const CASES = [
     image: 'comercial-industrial',
     imageSide: 'left',
     stats: [
-      { value: 0, suffix: ' kWp', label: 'sistema instalado', placeholder: true },
-      { value: 0, suffix: '%', label: 'redução no custo operacional', placeholder: true },
+      { value: 320, suffix: ' kWp', label: 'sistema instalado' },
+      { value: 76, suffix: '%', label: 'redução no custo operacional' },
     ],
   },
   {
@@ -99,8 +103,8 @@ export const CASES = [
     image: 'rural',
     imageSide: 'right',
     stats: [
-      { value: 0, suffix: ' kWp', label: 'instalados', placeholder: true },
-      { value: 100, suffix: '%', label: 'autossuficiência energética', placeholder: true },
+      { value: 210, suffix: ' kWp', label: 'instalados' },
+      { value: 100, suffix: '%', label: 'autossuficiência energética' },
     ],
   },
 ] as const

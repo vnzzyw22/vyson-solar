@@ -1,30 +1,27 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Nav } from './components/Nav'
 import { MobileCTABar } from './components/MobileCTABar'
-import { Hero } from './components/Hero'
-import { Partners } from './components/Partners'
-import { About } from './components/About'
-import { Process } from './components/Process'
-import { Services } from './components/Services'
-import { Cases } from './components/Cases'
-import { FAQ } from './components/FAQ'
 import { CTAFooter } from './components/CTAFooter'
+import { CookieConsent } from './components/CookieConsent'
+import { Home } from './pages/Home'
+import { PrivacyPolicy } from './pages/PrivacyPolicy'
 
 function App() {
   return (
-    <div className="pb-16 md:pb-0">
-      <Nav />
-      <main>
-        <Hero />
-        <Partners />
-        <About />
-        <Process />
-        <Services />
-        <Cases />
-        <FAQ />
-      </main>
-      <CTAFooter />
-      <MobileCTABar />
-    </div>
+    <BrowserRouter>
+      <div className="pb-16 md:pb-0">
+        <Nav />
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
+          </Routes>
+        </main>
+        <CTAFooter />
+        <MobileCTABar />
+        <CookieConsent />
+      </div>
+    </BrowserRouter>
   )
 }
 
