@@ -1,10 +1,8 @@
 const PLACEHOLDER_PARTNERS = [
-  'Fornecedor 01',
-  'Fornecedor 02',
-  'Fornecedor 03',
-  'Fornecedor 04',
-  'Fornecedor 05',
-  'Fornecedor 06',
+  { name: 'Canadian Solar', src: '/fornecedores/canadian-solar.png' },
+  { name: 'Growatt', src: '/fornecedores/growatt.jpg' },
+  { name: 'Fronius', src: '/fornecedores/fronius-fornecedor.jpg' },
+  { name: 'WEG', src: '/fornecedores/weg-fornecedor.png' },
 ]
 
 /**
@@ -24,14 +22,14 @@ export function Partners() {
       <div className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-cream to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-cream to-transparent" />
-        <div className="flex w-max animate-marquee gap-12 motion-reduce:animate-none">
-          {items.map((name, i) => (
-            <span
-              key={`${name}-${i}`}
-              className="whitespace-nowrap text-lg font-semibold tracking-tight text-navy/25"
-            >
-              {name}
-            </span>
+        <div className="flex w-max animate-marquee items-center gap-12 motion-reduce:animate-none">
+          {items.map((partner, i) => (
+            <img
+              key={`${partner.name}-${i}`}
+              src={partner.src}
+              alt={partner.name}
+              className="h-10 w-auto shrink-0 object-contain opacity-70 transition-opacity duration-300 hover:opacity-100"
+            />
           ))}
         </div>
       </div>

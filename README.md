@@ -35,6 +35,19 @@ npx vercel          # deploy de preview
 npx vercel --prod    # deploy de produção
 ```
 
+Também existe um site espelho na Netlify (criado em 2026-09-14, via `netlify-cli`, para contornar
+uma trava na interface web da Netlify): **https://vysao-solar.netlify.app** (project ID
+`7daa4528-ee15-4c5e-9888-dc38504b8f99`, conta `vbcs2009@gmail.com`, time "vbcs2009's team"). Não
+tem `netlify.toml` — o build (`npm run build`, publish dir `dist`) foi auto-detectado. **Esse site
+está com "Team protection" ativado** (recurso da própria Netlify, padrão da conta) — a URL pública
+mostra "This site is private" até alguém desativar isso manualmente em
+app.netlify.com → time → Team settings → Protection (não é configurável via CLI). Redeploy:
+
+```bash
+netlify build
+netlify deploy --prod --dir=dist
+```
+
 ## Assets de marca
 
 A logo oficial está em `src/assets/logo-vysao/`:
@@ -81,11 +94,42 @@ no futuro, podem substituir os cutouts diretamente sem mudar o código dos compo
   `src/content.ts` usam valores fictícios plausíveis (marcados com `// TODO: números fictícios`
   no arquivo) para preencher o layout — substituir pelos números reais antes de publicar de
   verdade, mesmo que não apareçam como "a confirmar" na tela.
-- Imagem de hero dedicada e condições de pagamento seguem pendentes (ver Seção 4/8 do documento
-  de direção) — a logo real já foi integrada.
-- Trocar os logos de fornecedores placeholder na faixa de parceiros (`src/components/Partners.tsx`).
+- Condições de pagamento seguem pendentes (ver Seção 8 do documento de direção) — a logo real e a
+  imagem/vídeo de hero já foram integrados.
 - Comprar/apontar o domínio `vysaosolar.com.br` e atualizar as 3 URLs marcadas com TODO (SEO).
 - Criar as contas Google Analytics / Meta Pixel e trocar os IDs placeholder.
+- Testar em iPhone real (Safari) — GSAP ScrollTrigger e o `backdrop-blur` da nav têm histórico de
+  comportamento diferente no Safari.
+- Se quiser o site Netlify público sem login, desativar "Team protection" (ver seção Deploy acima).
+
+## Log de decisões técnicas recentes (2026-09-14)
+
+- **Hero**: `IMAGES.hero` era literalmente byte-idêntico a `case-rural.webp` (bug de duplicação).
+  Removido; hero agora usa `src/components/HeroBackground.tsx` — vídeo em loop
+  (`public/vysao-hero-video-nuvens.mp4`) com dois `<video>` alternados fazendo crossfade de 0.45s
+  no fechamento do loop (esconde a costura do corte seco), poster `public/vysao-hero-sem-marca-dagua.jpg`
+  como base sempre visível, e respeita `prefers-reduced-motion` via o hook `useReducedMotion`.
+- **Nav bar**: decisão final é **barra única** — logo, links e CTA "Simular economia" no mesmo
+  container com fundo compartilhado (glassmorphism: `bg-cream/20` + `backdrop-blur-[18px]`, item
+  ativo com cápsula amarela via `layoutId` do Framer Motion). Chegou a existir uma variante com os
+  3 elementos como pílulas flutuantes independentes (sem fundo compartilhado) — foi revertida a
+  pedido do cliente, não repetir essa variante sem pedido explícito. Menu tem só
+  Sobre/Processo/Serviços/FAQ ("Cases" foi removido do menu, mas a seção continua na página).
+- **Logo** (`src/assets/logo-vysao/icon.webp`): tinha fundo branco sólido embutido na própria
+  imagem (não CSS) — corrigido para fundo transparente via processamento de canal alfa.
+- `color-scheme: light only` foi adicionado em `index.html` (meta tag) e `src/index.css` porque o
+  modo escuro forçado do navegador/SO quebra o glassmorphism da nav (o navegador recolore
+  elementos individualmente sem entender `backdrop-filter`, fragmentando a barra visualmente). Não
+  remover essa declaração.
+- **Fornecedores homologados** (`src/components/Partners.tsx`): trocados os `<span>` de texto por
+  `<img>` reais em `public/fornecedores/` — Canadian Solar, Growatt, Fronius, WEG. Todas com
+  `h-10 w-auto object-contain` (altura fixa, sem distorção) e `opacity-70 hover:opacity-100` — SEM
+  `grayscale`, o cliente pediu para manter as cores originais de cada marca. BYD e Deye foram
+  removidos da lista (não vão ter logo, por decisão do cliente — não adicionar de volta sem
+  pedido). O arquivo original de `weg-fornecedor.png` era a versão reversa da marca (glifo branco
+  vazado em fundo navy sólido) — reconstruído como versão positiva (glifo navy sobre transparente)
+  porque a versão branca ficaria invisível sobre a seção `bg-cream`. `growatt.jpg` teve o excesso
+  de espaço em branco cortado (export original vinha com bastante padding).
 
 Ver `VYSAO-SOLAR-DESIGN-DIRECTION.md` na raiz do repositório para o documento completo de direção
 de design e critérios de aprovação.

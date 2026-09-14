@@ -75,25 +75,25 @@ export function Nav() {
   return (
     <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:top-6">
       <div
-        className={`mx-auto flex max-w-5xl items-center justify-between gap-4 rounded-full border px-4 py-2.5 transition-colors duration-300 sm:px-5 ${
+        className={`mx-auto grid max-w-5xl grid-cols-[1fr_auto_1fr] items-center gap-4 rounded-full border px-4 py-2.5 backdrop-blur-[18px] transition-colors duration-300 sm:px-5 ${
           scrolled
-            ? 'border-navy/10 bg-cream/90 shadow-[0_8px_30px_rgba(0,35,80,0.12)] backdrop-blur-md'
-            : 'border-white/15 bg-cream/70 backdrop-blur-sm'
+            ? 'border-navy/15 bg-cream/20 shadow-[0_8px_30px_rgba(0,35,80,0.15)]'
+            : 'border-white/25 bg-cream/20'
         }`}
       >
-        <a href="/" onClick={handleLogoClick} className="shrink-0">
-          <Logo />
+        <a href="/" onClick={handleLogoClick} className="shrink-0 justify-self-start">
+          <Logo className="drop-shadow-[0_1px_3px_rgba(255,253,240,0.7)]" />
         </a>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="col-start-2 hidden items-center gap-1 justify-self-center md:flex">
           {NAV_LINKS.map((link) => {
             const isActive = activeHref === link.href
             return (
               <a
                 key={link.href}
                 href={link.href}
-                className={`relative rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                  isActive ? 'text-navy' : 'text-navy/70 hover:text-navy'
+                className={`relative rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors [text-shadow:0_1px_3px_rgba(255,253,240,0.6)] ${
+                  isActive ? 'text-navy' : 'text-navy/80 hover:text-navy'
                 }`}
               >
                 {isActive && (
@@ -109,30 +109,32 @@ export function Nav() {
           })}
         </nav>
 
-        <a
-          href={whatsappLink('Olá! Quero simular a economia com energia solar.')}
-          target="_blank"
-          rel="noreferrer"
-          className="hidden shrink-0 rounded-full bg-sun px-4 py-2 text-sm font-semibold text-navy transition-transform hover:scale-[1.03] hover:shadow-[0_6px_20px_rgba(255,185,0,0.45)] md:inline-block"
-        >
-          Simular economia
-        </a>
+        <div className="col-start-3 flex shrink-0 items-center justify-self-end gap-2">
+          <a
+            href={whatsappLink('Olá! Quero simular a economia com energia solar.')}
+            target="_blank"
+            rel="noreferrer"
+            className="hidden shrink-0 rounded-full bg-sun px-4 py-2 text-sm font-semibold text-navy transition-transform hover:scale-[1.03] hover:shadow-[0_6px_20px_rgba(255,185,0,0.45)] md:inline-block"
+          >
+            Simular economia
+          </a>
 
-        <button
-          type="button"
-          aria-label={open ? 'Fechar menu' : 'Abrir menu'}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="flex h-9 w-9 shrink-0 flex-col items-center justify-center gap-1.5 rounded-full md:hidden"
-        >
-          <span
-            className={`block h-0.5 w-5 bg-navy transition-transform ${open ? 'translate-y-2 rotate-45' : ''}`}
-          />
-          <span className={`block h-0.5 w-5 bg-navy transition-opacity ${open ? 'opacity-0' : ''}`} />
-          <span
-            className={`block h-0.5 w-5 bg-navy transition-transform ${open ? '-translate-y-2 -rotate-45' : ''}`}
-          />
-        </button>
+          <button
+            type="button"
+            aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="flex h-9 w-9 shrink-0 flex-col items-center justify-center gap-1.5 rounded-full md:hidden"
+          >
+            <span
+              className={`block h-0.5 w-5 bg-navy transition-transform ${open ? 'translate-y-2 rotate-45' : ''}`}
+            />
+            <span className={`block h-0.5 w-5 bg-navy transition-opacity ${open ? 'opacity-0' : ''}`} />
+            <span
+              className={`block h-0.5 w-5 bg-navy transition-transform ${open ? '-translate-y-2 -rotate-45' : ''}`}
+            />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { IMAGES } from '../assets/images'
+import { HeroBackground } from './HeroBackground'
 import { whatsappLink } from '../content'
 
 const badges = ['+100 projetos realizados', 'Maringá e região', 'Projeto, instalação e pós-venda']
@@ -7,11 +7,7 @@ const badges = ['+100 projetos realizados', 'Maringá e região', 'Projeto, inst
 export function Hero() {
   return (
     <section id="top" className="relative flex h-[92svh] min-h-[560px] w-full items-end overflow-hidden sm:h-[100svh]">
-      <img
-        src={IMAGES.hero}
-        alt="Vista aérea de propriedade rural no Paraná com sistema fotovoltaico integrado ao telhado, ao entardecer"
-        className="absolute inset-0 h-full w-full object-cover object-[65%_center] sm:object-center"
-      />
+      <HeroBackground />
       <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/55 to-navy/5" />
       <div className="absolute inset-0 bg-gradient-to-r from-navy/70 via-navy/10 to-transparent" />
 
