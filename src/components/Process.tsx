@@ -68,7 +68,7 @@ export function Process() {
               {PROCESS_STEPS.map((step, i) => (
                 <span
                   key={step.number}
-                  className="absolute inset-0 flex items-center justify-center font-display text-[180px] font-medium leading-none transition-opacity duration-500"
+                  className="absolute inset-0 flex items-center justify-center text-[180px] font-bold leading-none transition-opacity duration-500"
                   style={{
                     opacity: i === activeStep ? 1 : 0,
                     WebkitTextStroke: '2px rgba(255,253,240,0.35)',
@@ -179,7 +179,7 @@ function ProcessMobileCarousel() {
             />
             <div className="pt-5">
               <span
-                className="font-display text-6xl font-medium leading-none"
+                className="text-6xl font-bold leading-none"
                 style={{ WebkitTextStroke: '1.5px rgba(255,253,240,0.4)', color: 'transparent' }}
               >
                 {step.number}
@@ -219,7 +219,7 @@ function ProcessStacked() {
             />
             <div className="pt-5">
               <span
-                className="font-display text-6xl font-medium leading-none"
+                className="text-6xl font-bold leading-none"
                 style={{ WebkitTextStroke: '1.5px rgba(255,253,240,0.4)', color: 'transparent' }}
               >
                 {step.number}

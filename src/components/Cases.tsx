@@ -45,7 +45,7 @@ export function Cases() {
                   {c.tag}
                 </span>
                 <h3
-                  className="mt-2 font-display text-5xl font-medium leading-none sm:text-6xl lg:text-7xl"
+                  className="mt-2 text-5xl font-medium leading-none sm:text-6xl lg:text-7xl"
                   style={{ WebkitTextStroke: '1px #002350', color: 'transparent' }}
                 >
                   {c.title}
