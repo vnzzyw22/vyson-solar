@@ -11,6 +11,7 @@ Site institucional da Vysão Solar (Maringá — PR), construído a partir do do
 - Framer Motion (animações gerais de scroll; respeita `prefers-reduced-motion` via `MotionConfig`)
 - GSAP ScrollTrigger (apenas na seção Processo, pinned scroll — desktop only; carregado sob
   demanda via `React.lazy`, não entra no bundle principal)
+- Backend: uma única Vercel Function (`api/leads.ts`) + MongoDB Atlas — ver "Captura de lead"
 
 ## Rodando localmente
 
@@ -65,16 +66,15 @@ pediu — se um dia perguntar "por que o botão faz coisas diferentes", a respos
 inconsistência leftover. (Não existe mais `MobileCTABar` — foi removido numa sessão paralela pra
 resolver espaçamento da seção Serviços no mobile; não recriar sem pedido explícito.)
 
-## Captura de lead (Netlify Forms)
+## Captura de lead (MongoDB Atlas)
 
 O CTA "Simular economia" do Nav e `CTAFooter` (não o do Hero, ver acima) abre um modal
 (`src/components/LeadFormModal.tsx`, estado global via `src/context/LeadFormContext.tsx`) pedindo
 **nome, telefone, cidade, valor médio da conta de luz (R$) e tipo de imóvel
-(Residencial/Comercial/Rural)** antes de redirecionar pro WhatsApp — sem Supabase, sem backend
-próprio, usando **Netlify Forms**. Tem honeypot anti-spam (`bot-field`, via
-`data-netlify-honeypot`), trava o scroll do body e prende o foco/Escape enquanto aberto. Funciona
-no site real (Netlify, acima). Só pararia de funcionar se o site fosse publicado em outro lugar
-sem suporte a Netlify Forms (Vercel, por exemplo, não processaria o POST) — não é o caso hoje.
+(Residencial/Comercial/Rural)** antes de redirecionar pro WhatsApp. Migrado do Netlify Forms em
+2026-09-15 (a hospedagem saiu da Netlify — ver seção Deploy) pra uma **Vercel Function própria**
+(`api/leads.ts`) que salva no **MongoDB Atlas** (cluster M0 grátis), usando o driver oficial
+`mongodb`. Sem Supabase.
 
 A mensagem final do WhatsApp segue um formato fixo definido em `buildWhatsappMessage`:
 
@@ -88,17 +88,34 @@ Tenho interesse em simular economia com energia solar.
 ```
 
 Como funciona:
-- `index.html` tem um `<form name="simular-economia" data-netlify="true" data-netlify-honeypot="bot-field" hidden>`
-  estático com os mesmos campos do modal (incluindo o honeypot) — é assim que o Netlify detecta o
-  formulário no build (ele lê o HTML gerado, não executa JS, então um form só-React não seria
-  encontrado). **Se adicionar/renomear campo no modal, espelhar aqui também.**
+- `api/leads.ts` é uma Vercel Function Node (não faz parte do bundle do Vite — a Vercel builda e
+  serve isso separadamente a partir da pasta `api/` na raiz do repo). Recebe POST em JSON, valida
+  campos obrigatórios, e insere um documento na coleção `leads` do banco `vysao-solar`. Reaproveita
+  a conexão com o Mongo entre invocações "quentes" da function (variável de módulo
+  `cachedClientPromise`) — abrir conexão nova a cada request esgota rápido o limite do cluster M0
+  sob concorrência.
+- Tipos de `req`/`res` são declarados localmente no arquivo (não usa o pacote `@vercel/node`) — a
+  árvore de dependências dele trazia 5 vulnerabilidades conhecidas (ajv/path-to-regexp/undici
+  desatualizados) só por causa dos tipos, sem necessidade real.
+- Honeypot anti-spam: campo escondido `bot-field` no formulário (`LeadFormModal.tsx`), lido via
+  `ref` (não é `useState` — um bot preenchendo via JS não dispara `onChange`) e checado no
+  servidor (`api/leads.ts`) — se vier preenchido, responde sucesso sem gravar nada, pra não
+  sinalizar pro bot que foi filtrado.
+- `MONGODB_URI` é variável de ambiente só na Vercel (`vercel env add MONGODB_URI production`),
+  **nunca no código nem commitada** — sem ela, a function lança erro e o front loga no console e
+  redireciona pro WhatsApp mesmo assim (nunca trava o usuário).
 - No submit do modal, abre a aba do WhatsApp de forma síncrona (`window.open` logo no clique,
   antes do `await` do fetch — senão o navegador bloqueia como pop-up) e só depois faz o
-  `fetch('/', { method: 'POST', ... })` com `Content-Type: application/x-www-form-urlencoded`. Se
-  falhar (rede ou status não-OK), loga no console e redireciona pro WhatsApp mesmo assim — nunca
-  trava o usuário.
+  `fetch('/api/leads', { method: 'POST', ... })` com `Content-Type: application/json`.
 
-Onde ver os leads enviados: painel da Netlify → site → aba **Forms**.
+Onde ver os leads salvos: painel do MongoDB Atlas → cluster → Browse Collections →
+`vysao-solar.leads`.
+
+**Atenção:** `/api/leads` só funciona quando servido pela Vercel (produção ou `vercel dev`) — o
+servidor de dev do Vite (`npm run dev`) não roda Serverless Functions, então testar o formulário
+localmente com `npm run dev` sempre vai cair no catch (erro de rede) e só redirecionar pro
+WhatsApp sem salvar nada. Pra testar de verdade localmente, usar `vercel dev` (puxa
+`MONGODB_URI` do ambiente da Vercel automaticamente, uma vez logado/linkado).
 
 ## Assets de marca
 
@@ -219,6 +236,17 @@ no futuro, podem substituir os cutouts diretamente sem mudar o código dos compo
   `EconomiaSimulator.tsx` e a restrição do vídeo no mobile (exclusivos desta sessão) foram
   mantidos. **Lição:** com duas sessões/máquinas ativas na mesma conta, sempre `git fetch` +
   conferir `git log origin/main` antes de presumir que `git push` vai ser um fast-forward direto.
+- **Migração Netlify → Vercel**: a conta Netlify ficou sem créditos e passou a recusar todo
+  deploy com `JSONHTTPError: Forbidden` (não era SSO, como se suspeitou a princípio — login novo
+  não resolveu porque o problema era billing, não token). Site publicado na Vercel via CLI:
+  https://vysao-solar.vercel.app. `netlify.toml` nunca existiu; `vercel.json` já estava no repo
+  desde o scaffold inicial. Deploy ainda manual (`vercel --prod`) — a tentativa de conectar o
+  GitHub automaticamente falhou (log: `Failed to connect ... Make sure ... you have access`), não
+  investigado a fundo ainda.
+- **Migração Netlify Forms → MongoDB Atlas**: ver seção "Captura de lead" acima. `MONGODB_URI`
+  configurada como variável de ambiente Secret na Vercel (`vercel env add`), valor nunca escrito
+  em nenhum arquivo do repo. Removido o formulário estático oculto do `index.html` e os atributos
+  `data-netlify*` do `LeadFormModal.tsx` — não fazem mais sentido fora da Netlify.
 
 Ver `VYSAO-SOLAR-DESIGN-DIRECTION.md` na raiz do repositório para o documento completo de direção
 de design e critérios de aprovação.

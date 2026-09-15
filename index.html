@@ -69,23 +69,6 @@
     </script>
   </head>
   <body>
-    <!-- Formulário estático só pra detecção do Netlify Forms no build (o bot deles não
-         executa JS, então o form real renderizado pelo React não seria encontrado sozinho).
-         Os campos aqui precisam bater exatamente com os do formulário em
-         src/components/LeadFormModal.tsx. Nunca removido/mostrado — fica oculto sempre. -->
-    <form name="simular-economia" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
-      <input type="text" name="nome" />
-      <input type="tel" name="telefone" />
-      <input type="text" name="cidade" />
-      <input type="number" name="valor_conta" />
-      <select name="tipo_imovel">
-        <option value="Residencial">Residencial</option>
-        <option value="Comercial">Comercial</option>
-        <option value="Rural">Rural</option>
-      </select>
-      <input name="bot-field" />
-    </form>
-
     <div id="root"></div>
 
     <script type="module" src="/src/main.tsx"></script>

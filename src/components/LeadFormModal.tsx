@@ -4,14 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useLeadForm } from '../context/LeadFormContext'
 import { whatsappLink } from '../content'
 
-const FORM_NAME = 'simular-economia'
 const TIPOS_IMOVEL = ['Residencial', 'Comercial', 'Rural']
-
-function encodeFormData(data: Record<string, string>) {
-  return Object.entries(data)
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-    .join('&')
-}
 
 function buildWhatsappMessage({
   nome,
@@ -44,6 +37,7 @@ export function LeadFormModal() {
   const [tipoImovel, setTipoImovel] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const firstFieldRef = useRef<HTMLInputElement>(null)
+  const botFieldRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (isOpen) {
@@ -76,27 +70,26 @@ export function LeadFormModal() {
     const whatsappTab = window.open('', '_blank', 'noopener,noreferrer')
 
     try {
-      const res = await fetch('/', {
+      const res = await fetch('/api/leads', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encodeFormData({
-          'form-name': FORM_NAME,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           nome,
           telefone,
           cidade,
           valor_conta: valorConta,
           tipo_imovel: tipoImovel,
-          'bot-field': '',
+          'bot-field': botFieldRef.current?.value ?? '',
         }),
       })
       if (!res.ok) {
         console.error(
-          `[lead-form] Netlify Forms respondeu com erro (${res.status}) — o lead pode não ter sido salvo. Redirecionando pro WhatsApp mesmo assim.`,
+          `[lead-form] /api/leads respondeu com erro (${res.status}) — o lead pode não ter sido salvo. Redirecionando pro WhatsApp mesmo assim.`,
         )
       }
     } catch (err) {
       console.error(
-        '[lead-form] Falha ao enviar o formulário pro Netlify Forms — o lead não foi salvo. Redirecionando pro WhatsApp mesmo assim.',
+        '[lead-form] Falha ao enviar o formulário pra /api/leads — o lead não foi salvo. Redirecionando pro WhatsApp mesmo assim.',
         err,
       )
     }
@@ -159,11 +152,11 @@ export function LeadFormModal() {
               Preencha seus dados e te chamamos no WhatsApp com a simulação.
             </p>
 
-            <form name={FORM_NAME} data-netlify="true" onSubmit={handleSubmit} className="mt-6 space-y-4">
-              <input type="hidden" name="form-name" value={FORM_NAME} />
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <p hidden>
                 <label>
-                  Não preencha isto: <input name="bot-field" tabIndex={-1} autoComplete="off" />
+                  Não preencha isto:{' '}
+                  <input ref={botFieldRef} name="bot-field" tabIndex={-1} autoComplete="off" />
                 </label>
               </p>
 
