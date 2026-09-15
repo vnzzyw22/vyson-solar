@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion'
 import { HeroBackground } from './HeroBackground'
 import { whatsappLink } from '../content'
+import { useLeadForm } from '../context/LeadFormContext'
 
 const badges = ['+100 projetos realizados', 'Maringá e região', 'Projeto, instalação e pós-venda']
 
 export function Hero() {
+  const { open: openLeadForm } = useLeadForm()
+
   return (
     <section id="top" className="relative flex h-[92svh] min-h-[560px] w-full items-end overflow-hidden sm:h-[100svh]">
       <HeroBackground />
@@ -39,14 +42,13 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.24, ease: 'easeOut' }}
             className="mt-8 flex flex-wrap items-center gap-5"
           >
-            <a
-              href={whatsappLink('Olá! Quero simular a economia com energia solar.')}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={openLeadForm}
               className="rounded-full bg-sun px-7 py-3.5 text-sm font-semibold text-navy transition-[transform,box-shadow] hover:scale-[1.03] hover:shadow-[0_10px_30px_rgba(255,185,0,0.4)] sm:text-base"
             >
               Simular economia
-            </a>
+            </button>
             <a
               href={whatsappLink('Olá! Quero falar com um especialista da Vysão Solar.')}
               target="_blank"

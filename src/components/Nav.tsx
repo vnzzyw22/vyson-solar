@@ -2,7 +2,8 @@ import { useEffect, useState, type MouseEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Logo } from './Logo'
-import { NAV_LINKS, whatsappLink } from '../content'
+import { NAV_LINKS } from '../content'
+import { useLeadForm } from '../context/LeadFormContext'
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -10,6 +11,7 @@ export function Nav() {
   const [activeHref, setActiveHref] = useState<string | null>(null)
   const location = useLocation()
   const navigate = useNavigate()
+  const { open: openLeadForm } = useLeadForm()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -110,14 +112,13 @@ export function Nav() {
         </nav>
 
         <div className="col-start-3 flex shrink-0 items-center justify-self-end gap-2">
-          <a
-            href={whatsappLink('Olá! Quero simular a economia com energia solar.')}
-            target="_blank"
-            rel="noreferrer"
+          <button
+            type="button"
+            onClick={openLeadForm}
             className="hidden shrink-0 rounded-full bg-sun px-4 py-2 text-sm font-semibold text-navy transition-transform hover:scale-[1.03] hover:shadow-[0_6px_20px_rgba(255,185,0,0.45)] md:inline-block"
           >
             Simular economia
-          </a>
+          </button>
 
           <button
             type="button"
@@ -156,15 +157,16 @@ export function Nav() {
                 {link.label}
               </a>
             ))}
-            <a
-              href={whatsappLink('Olá! Quero simular a economia com energia solar.')}
-              target="_blank"
-              rel="noreferrer"
-              onClick={handleLinkClick}
+            <button
+              type="button"
+              onClick={() => {
+                handleLinkClick()
+                openLeadForm()
+              }}
               className="mt-1 rounded-full bg-sun px-4 py-2.5 text-center text-sm font-semibold text-navy"
             >
               Simular economia
-            </a>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
