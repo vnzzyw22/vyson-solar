@@ -69,45 +69,6 @@ export const SERVICES = [
   },
 ] as const
 
-// TODO: números fictícios, confirmar com cliente — ver Seção 8/13 do documento de
-// direção (VYSAO-SOLAR-DESIGN-DIRECTION.md). Resultados plausíveis para preencher o
-// layout, não projetos reais. Substituir por dados reais assim que o cliente aprovar.
-export const CASES = [
-  {
-    id: 'residencial',
-    tag: 'Residencial',
-    title: 'Residencial',
-    image: 'residencial',
-    imageSide: 'right',
-    stats: [
-      { value: 88, suffix: '%', label: 'redução na conta' },
-      { value: 4, suffix: ' anos', label: 'payback estimado' },
-    ],
-  },
-  {
-    id: 'comercial-industrial',
-    tag: 'Comercial & Industrial',
-    title: 'Comercial & Industrial',
-    image: 'comercial-industrial',
-    imageSide: 'left',
-    stats: [
-      { value: 320, suffix: ' kWp', label: 'sistema instalado' },
-      { value: 76, suffix: '%', label: 'redução no custo operacional' },
-    ],
-  },
-  {
-    id: 'rural',
-    tag: 'Rural',
-    title: 'Rural',
-    image: 'rural',
-    imageSide: 'right',
-    stats: [
-      { value: 210, suffix: ' kWp', label: 'instalados' },
-      { value: 100, suffix: '%', label: 'autossuficiência energética' },
-    ],
-  },
-] as const
-
 export const FAQ_ITEMS = [
   {
     q: 'Quanto posso economizar com energia solar?',

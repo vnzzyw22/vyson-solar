@@ -4,7 +4,7 @@ import { EconomiaSimulator } from '../components/EconomiaSimulator'
 import { Partners } from '../components/Partners'
 import { About } from '../components/About'
 import { Services } from '../components/Services'
-import { Cases } from '../components/Cases'
+import { Differentials } from '../components/Differentials'
 import { FAQ } from '../components/FAQ'
 
 // GSAP is only needed for the pinned Process section — split it into its own
@@ -22,7 +22,7 @@ export function Home() {
         <Process />
       </Suspense>
       <Services />
-      <Cases />
+      <Differentials />
       <FAQ />
     </>
   )
