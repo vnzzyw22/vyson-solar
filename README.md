@@ -27,26 +27,25 @@ npm run build
 
 ## Deploy
 
-Hospedado no Vercel. `vercel.json` já tem o rewrite de SPA necessário para a rota
-`/politica-de-privacidade` funcionar em produção (sem isso, acessar a URL direto dá 404).
+**Site em produção: https://vysaosolar.netlify.app** (sem hífen entre "vysao" e "solar" — atenção
+pra não confundir com `vysao-solar.netlify.app`, que não existe e dá 404). Project ID
+`7daa4528-ee15-4c5e-9888-dc38504b8f99`, conta `vbcs2009@gmail.com`, time "vbcs2009's team". Público,
+sem proteção de acesso (checado em 2026-09-15 com `curl` — HTTP 200 direto, sem tela de login).
+
+Deploy é **manual via CLI**, não é conectado ao GitHub (push não redeploya sozinho — precisa rodar
+os comandos abaixo depois de cada mudança que for pra produção). Não tem `netlify.toml`; o comando
+de build (`npm run build`, publish dir `dist`) foi auto-detectado na primeira vez.
 
 ```bash
-npx vercel          # deploy de preview
-npx vercel --prod    # deploy de produção
+npx netlify-cli login              # só na primeira vez / máquina nova
+npx netlify-cli link --id 7daa4528-ee15-4c5e-9888-dc38504b8f99   # idem
+npm run build
+npx netlify-cli deploy --prod --dir=dist
 ```
 
-Também existe um site espelho na Netlify (criado em 2026-09-14, via `netlify-cli`, para contornar
-uma trava na interface web da Netlify): **https://vysao-solar.netlify.app** (project ID
-`7daa4528-ee15-4c5e-9888-dc38504b8f99`, conta `vbcs2009@gmail.com`, time "vbcs2009's team"). Não
-tem `netlify.toml` — o build (`npm run build`, publish dir `dist`) foi auto-detectado. **Esse site
-está com "Team protection" ativado** (recurso da própria Netlify, padrão da conta) — a URL pública
-mostra "This site is private" até alguém desativar isso manualmente em
-app.netlify.com → time → Team settings → Protection (não é configurável via CLI). Redeploy:
-
-```bash
-netlify build
-netlify deploy --prod --dir=dist
-```
+Também existe `vercel.json` no repo (rewrite de SPA pra `/politica-de-privacidade` não dar 404),
+preparado caso decidam migrar ou espelhar no Vercel no futuro — mas isso **nunca foi publicado**;
+não confundir com um site real. Se for usado: `npx vercel --prod`.
 
 ## Assets de marca
 
@@ -69,9 +68,10 @@ no futuro, podem substituir os cutouts diretamente sem mudar o código dos compo
 ## SEO / Analytics / LGPD
 
 - Meta tags Open Graph/Twitter, `robots.txt`, `sitemap.xml` e JSON-LD (`LocalBusiness`) já
-  configurados em `index.html` — todos com **TODO marcado no próprio arquivo** apontando pra URL
-  temporária do Vercel; trocar pelo domínio final quando o DNS de `vysaosolar.com.br` for
-  apontado (são 3 arquivos: `index.html`, `public/robots.txt`, `public/sitemap.xml`).
+  configurados em `index.html`, apontando pra URL real em produção
+  (`https://vysaosolar.netlify.app`) — todos com **TODO marcado no próprio arquivo**; trocar pelo
+  domínio final quando o DNS de `vysaosolar.com.br` for apontado (são 3 arquivos: `index.html`,
+  `public/robots.txt`, `public/sitemap.xml`).
 - Imagem de compartilhamento (`public/og-image.jpg`, 1200×630) já gerada com a identidade do site.
 - Google Analytics (GA4) e Meta Pixel estão implementados em `src/lib/analytics.ts`, mas com
   **IDs placeholder** (`G-XXXXXXXXXX` e `0000000000000000`) — nesse estado eles não carregam
@@ -100,7 +100,6 @@ no futuro, podem substituir os cutouts diretamente sem mudar o código dos compo
 - Criar as contas Google Analytics / Meta Pixel e trocar os IDs placeholder.
 - Testar em iPhone real (Safari) — GSAP ScrollTrigger e o `backdrop-blur` da nav têm histórico de
   comportamento diferente no Safari.
-- Se quiser o site Netlify público sem login, desativar "Team protection" (ver seção Deploy acima).
 
 ## Log de decisões técnicas recentes (2026-09-14)
 
