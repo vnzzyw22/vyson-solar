@@ -40,9 +40,7 @@ export function Hero() {
             className="mt-8 flex flex-wrap items-center gap-5"
           >
             <a
-              href={whatsappLink('Olá! Quero simular a economia com energia solar.')}
-              target="_blank"
-              rel="noreferrer"
+              href="/#simulador"
               className="rounded-full bg-sun px-7 py-3.5 text-sm font-semibold text-navy transition-[transform,box-shadow] hover:scale-[1.03] hover:shadow-[0_10px_30px_rgba(255,185,0,0.4)] sm:text-base"
             >
               Simular economia

@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Hero } from '../components/Hero'
+import { EconomiaSimulator } from '../components/EconomiaSimulator'
 import { Partners } from '../components/Partners'
 import { About } from '../components/About'
 import { Services } from '../components/Services'
@@ -14,6 +15,7 @@ export function Home() {
   return (
     <>
       <Hero />
+      <EconomiaSimulator />
       <Partners />
       <About />
       <Suspense fallback={<div className="min-h-[60vh] bg-navy" />}>

@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useMediaQuery } from '../hooks/useMediaQuery'
+
+// Mesmo breakpoint "md" (768px) já usado no resto do site (Nav, MobileCTABar)
+// para separar desktop de mobile.
+const MOBILE_QUERY = '(max-width: 767px)'
 
 const HERO_VIDEO_SRC = '/vysao-hero-video-nuvens.mp4'
 const HERO_POSTER_SRC = '/vysao-hero-sem-marca-dagua.jpg'
@@ -79,6 +84,10 @@ function HeroLoopingVideo() {
 
 export function HeroBackground() {
   const reducedMotion = useReducedMotion()
+  // No mobile o vídeo nem chega a ser montado — evita gastar dado do usuário
+  // baixando os ~4.6MB do vídeo; a imagem estática cobre o fallback sozinha.
+  const isMobile = useMediaQuery(MOBILE_QUERY)
+  const showVideo = !reducedMotion && !isMobile
 
   return (
     <>
@@ -87,7 +96,7 @@ export function HeroBackground() {
         alt="Nuvens e sombras em movimento sobre paisagem do interior do Paraná com sistema fotovoltaico instalado"
         className={backgroundLayerClassName}
       />
-      {!reducedMotion && <HeroLoopingVideo />}
+      {showVideo && <HeroLoopingVideo />}
     </>
   )
 }

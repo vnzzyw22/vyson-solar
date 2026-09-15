@@ -2,9 +2,12 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Logo } from './Logo'
 import icon from '../assets/logo-vysao/icon.webp'
-import { CONTACT, NAV_LINKS, whatsappLink } from '../content'
+import { CONTACT, NAV_LINKS } from '../content'
+import { useSimularEconomia } from '../context/SimularEconomiaContext'
 
 export function CTAFooter() {
+  const { open } = useSimularEconomia()
+
   return (
     <footer className="relative overflow-hidden bg-navy">
       <img
@@ -36,14 +39,13 @@ export function CTAFooter() {
             transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
             className="mt-8 flex flex-wrap items-center justify-center gap-6"
           >
-            <a
-              href={whatsappLink('Olá! Quero simular a economia com energia solar.')}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={open}
               className="rounded-full bg-sun px-7 py-3.5 text-sm font-semibold text-navy transition-[transform,box-shadow] hover:scale-[1.03] hover:shadow-[0_10px_30px_rgba(255,185,0,0.4)] sm:text-base"
             >
               Simular economia agora
-            </a>
+            </button>
             <a
               href="/#servicos"
               className="text-sm font-semibold text-cream underline decoration-cream/40 underline-offset-4 transition-colors hover:decoration-cream sm:text-base"

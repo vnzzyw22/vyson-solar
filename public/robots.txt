@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vysaosolar.vercel.app/sitemap.xml
+Sitemap: https://vysao-solar.netlify.app/sitemap.xml
