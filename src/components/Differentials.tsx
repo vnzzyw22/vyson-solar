@@ -90,8 +90,7 @@ export function Differentials() {
             className="absolute inset-0 h-full w-full object-cover"
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-navy/78" />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/50 to-navy/60" />
+        <div className="absolute inset-0 bg-navy/45" />
       </div>
 
       <div className="relative mx-auto max-w-6xl">
@@ -123,12 +122,12 @@ export function Differentials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-10%' }}
               transition={{ duration: 0.5, delay: i * 0.08, ease: 'easeOut' }}
-              className="group rounded-2xl border border-cream/15 bg-cream/95 p-7 shadow-[0_12px_40px_rgba(0,0,0,0.25)] backdrop-blur-md transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-sun/60 hover:shadow-[0_0_0_1px_rgba(255,185,0,0.4),0_20px_50px_rgba(0,0,0,0.3)]"
+              className="group rounded-2xl border border-white/25 bg-white/5 p-7 backdrop-blur-sm transition-[border-color,background-color,transform] duration-300 hover:-translate-y-1 hover:border-sun/70 hover:bg-white/10"
             >
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-sun/15 text-sun transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                 <span className="h-7 w-7">{item.icon}</span>
               </div>
-              <p className="mt-5 text-base font-semibold leading-snug text-navy sm:text-lg">{item.text}</p>
+              <p className="mt-5 text-base font-semibold leading-snug text-cream sm:text-lg">{item.text}</p>
             </motion.div>
           ))}
         </div>
