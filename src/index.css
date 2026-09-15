@@ -2,6 +2,7 @@
 
 @theme {
   --font-sans: "Sora", system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
 
   --color-navy: #002350;
   --color-cream: #fffdf0;
