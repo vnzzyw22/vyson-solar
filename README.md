@@ -27,26 +27,24 @@ npm run build
 
 ## Deploy
 
-**Site em produção: https://vysaosolar.netlify.app** (sem hífen entre "vysao" e "solar" — atenção
-pra não confundir com `vysao-solar.netlify.app`, que não existe e dá 404). Project ID
-`7daa4528-ee15-4c5e-9888-dc38504b8f99`, conta `vbcs2009@gmail.com`, time "vbcs2009's team". Público,
-sem proteção de acesso (checado em 2026-09-15 com `curl` — HTTP 200 direto, sem tela de login;
-chegou a ter "Team protection" ativado logo depois de criado, mas foi desativado).
-
-Deploy é **manual via CLI**, não é conectado ao GitHub (push não redeploya sozinho — precisa rodar
-os comandos abaixo depois de cada mudança que for pra produção). Não tem `netlify.toml`; o comando
-de build (`npm run build`, publish dir `dist`) foi auto-detectado na primeira vez.
+**Site em produção: https://vysao-solar.vercel.app** (conta `vnzzyw` na Vercel). Migrado da Netlify
+pra Vercel em 2026-09-15 depois que a conta Netlify ficou sem créditos. Deploy é **manual via
+CLI** por enquanto — a tentativa de conectar automaticamente o repositório do GitHub no primeiro
+`vercel --prod` falhou silenciosamente (log mostrou `Failed to connect ... Make sure ... you have
+access to the repository`), então push no GitHub **não redeploya sozinho** ainda; precisa rodar
+os comandos abaixo depois de cada mudança que for pra produção. `vercel.json` já cuida do rewrite
+de SPA pra `/politica-de-privacidade` não dar 404.
 
 ```bash
-npx netlify-cli login              # só na primeira vez / máquina nova
-npx netlify-cli link --id 7daa4528-ee15-4c5e-9888-dc38504b8f99   # idem
+npx vercel login      # só na primeira vez / máquina nova (login por device code, sem navegador automático)
 npm run build
-npx netlify-cli deploy --prod --dir=dist
+npx vercel --prod
 ```
 
-Também existe `vercel.json` no repo (rewrite de SPA pra `/politica-de-privacidade` não dar 404),
-preparado caso decidam migrar ou espelhar no Vercel no futuro — mas isso **nunca foi publicado**;
-não confundir com um site real. Se for usado: `npx vercel --prod`.
+**Histórico:** o site já foi hospedado na Netlify (`vysaosolar.netlify.app`, sem hífen — ficou fora
+do ar por falta de créditos na conta) e, antes disso, chegou a ter `vercel.json` no repo sem nunca
+ter sido publicado de fato (sobra de scaffold inicial). Se algum dia reconectar o Git à Vercel
+(`vercel git connect`), documentar aqui.
 
 ## Simulador de economia
 
