@@ -25,9 +25,12 @@ const ICONS: Record<string, ReactNode> = {
 
 export function Services() {
   return (
-    <section id="servicos">
+    <section id="servicos" className="flex flex-col gap-5 sm:gap-0">
       {SERVICES.map((service, i) => (
-        <div key={service.id} className="relative h-[70vh] min-h-[420px] w-full overflow-hidden sm:h-[85vh]">
+        <div
+          key={service.id}
+          className="relative mx-4 h-[65vh] min-h-[400px] overflow-hidden rounded-3xl shadow-[0_12px_32px_rgba(0,35,80,0.22)] sm:mx-0 sm:h-[85vh] sm:rounded-none sm:shadow-none"
+        >
           <motion.img
             src={IMAGES[service.image]}
             alt={`${service.title} — ${service.text}`}

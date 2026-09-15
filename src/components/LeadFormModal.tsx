@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useSimularEconomia } from '../context/SimularEconomiaContext'
+import { useEffect, useRef, useState } from 'react'
+import type { FormEvent } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useLeadForm } from '../context/LeadFormContext'
 import { whatsappLink } from '../content'
 
 const FORM_NAME = 'simular-economia'
@@ -34,35 +35,48 @@ function buildWhatsappMessage({
   )
 }
 
-export function SimularEconomiaModal() {
-  const { isOpen, close } = useSimularEconomia()
+export function LeadFormModal() {
+  const { isOpen, close } = useLeadForm()
   const [nome, setNome] = useState('')
   const [telefone, setTelefone] = useState('')
   const [cidade, setCidade] = useState('')
   const [valorConta, setValorConta] = useState('')
   const [tipoImovel, setTipoImovel] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const firstFieldRef = useRef<HTMLInputElement>(null)
 
-  function resetForm() {
-    setNome('')
-    setTelefone('')
-    setCidade('')
-    setValorConta('')
-    setTipoImovel('')
-  }
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+      firstFieldRef.current?.focus()
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (!isOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isOpen, close])
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (submitting) return
     setSubmitting(true)
 
     // Precisa abrir a aba SINCRONAMENTE aqui, ainda dentro do gesto de clique —
-    // se abrirmos depois do fetch (await), o navegador trata como popup não
+    // se abrirmos só depois do fetch (await), o navegador trata como popup não
     // solicitado e bloqueia (acontece mesmo no Chrome, não só Safari).
     const whatsappTab = window.open('', '_blank', 'noopener,noreferrer')
 
     try {
-      const response = await fetch('/', {
+      const res = await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: encodeFormData({
@@ -72,13 +86,19 @@ export function SimularEconomiaModal() {
           cidade,
           valor_conta: valorConta,
           tipo_imovel: tipoImovel,
+          'bot-field': '',
         }),
       })
-      if (!response.ok) {
-        console.error(`Netlify Forms: envio de "${FORM_NAME}" retornou status ${response.status}`)
+      if (!res.ok) {
+        console.error(
+          `[lead-form] Netlify Forms respondeu com erro (${res.status}) — o lead pode não ter sido salvo. Redirecionando pro WhatsApp mesmo assim.`,
+        )
       }
     } catch (err) {
-      console.error(`Netlify Forms: falha ao enviar o formulário "${FORM_NAME}"`, err)
+      console.error(
+        '[lead-form] Falha ao enviar o formulário pro Netlify Forms — o lead não foi salvo. Redirecionando pro WhatsApp mesmo assim.',
+        err,
+      )
     }
 
     const url = whatsappLink(buildWhatsappMessage({ nome, telefone, cidade, tipoImovel, valorConta }))
@@ -90,12 +110,11 @@ export function SimularEconomiaModal() {
     }
 
     setSubmitting(false)
-    resetForm()
-    close()
-  }
-
-  function handleClose() {
-    if (submitting) return
+    setNome('')
+    setTelefone('')
+    setCidade('')
+    setValorConta('')
+    setTipoImovel('')
     close()
   }
 
@@ -107,106 +126,104 @@ export function SimularEconomiaModal() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-navy/50 p-4 backdrop-blur-sm"
-          onClick={handleClose}
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-navy/60 p-4 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) close()
+          }}
         >
           <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="simular-economia-title"
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="w-full max-w-md rounded-2xl border border-navy/10 bg-cream p-6 shadow-[0_20px_60px_rgba(0,35,80,0.25)] sm:p-8"
-            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="lead-form-title"
+            className="relative w-full max-w-md rounded-3xl bg-cream p-6 shadow-[0_20px_60px_rgba(0,35,80,0.3)] sm:p-8"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 id="simular-economia-title" className="text-xl font-bold text-navy sm:text-2xl">
-                  Simular economia
-                </h2>
-                <p className="mt-1.5 text-sm text-navy/70">
-                  Deixe seus dados e continue direto pelo WhatsApp com um especialista.
-                </p>
-              </div>
-              <button
-                type="button"
-                aria-label="Fechar"
-                onClick={handleClose}
-                className="shrink-0 rounded-full p-1.5 text-navy/50 transition-colors hover:bg-navy/5 hover:text-navy"
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                  <path d="M1 1L17 17M17 1L1 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-
-            <form
-              name={FORM_NAME}
-              data-netlify="true"
-              onSubmit={handleSubmit}
-              className="mt-6 flex flex-col gap-4"
+            <button
+              type="button"
+              onClick={close}
+              aria-label="Fechar"
+              className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full text-navy/50 transition-colors hover:bg-navy/5 hover:text-navy"
             >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 6l12 12M18 6l-12 12" strokeLinecap="round" />
+              </svg>
+            </button>
+
+            <h2 id="lead-form-title" className="pr-8 text-2xl font-bold text-navy">
+              Simular economia
+            </h2>
+            <p className="mt-2 text-sm text-navy/60">
+              Preencha seus dados e te chamamos no WhatsApp com a simulação.
+            </p>
+
+            <form name={FORM_NAME} data-netlify="true" onSubmit={handleSubmit} className="mt-6 space-y-4">
               <input type="hidden" name="form-name" value={FORM_NAME} />
+              <p hidden>
+                <label>
+                  Não preencha isto: <input name="bot-field" tabIndex={-1} autoComplete="off" />
+                </label>
+              </p>
 
               <div>
-                <label htmlFor="simular-economia-nome" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-navy/60">
+                <label htmlFor="lead-nome" className="text-sm font-medium text-navy/70">
                   Nome
                 </label>
                 <input
-                  id="simular-economia-nome"
+                  ref={firstFieldRef}
+                  id="lead-nome"
                   name="nome"
                   type="text"
                   required
                   autoComplete="name"
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
-                  className="w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-sm text-navy placeholder:text-navy/35"
-                  placeholder="Seu nome completo"
+                  className="mt-1.5 w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-navy outline-none transition-colors focus:border-electric"
                 />
               </div>
 
               <div>
-                <label htmlFor="simular-economia-telefone" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-navy/60">
-                  Telefone
+                <label htmlFor="lead-telefone" className="text-sm font-medium text-navy/70">
+                  Telefone (WhatsApp)
                 </label>
                 <input
-                  id="simular-economia-telefone"
+                  id="lead-telefone"
                   name="telefone"
                   type="tel"
+                  inputMode="tel"
                   required
                   autoComplete="tel"
+                  placeholder="(44) 9XXXX-XXXX"
                   value={telefone}
                   onChange={(e) => setTelefone(e.target.value)}
-                  className="w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-sm text-navy placeholder:text-navy/35"
-                  placeholder="(44) 99999-9999"
+                  className="mt-1.5 w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-navy outline-none transition-colors focus:border-electric"
                 />
               </div>
 
               <div>
-                <label htmlFor="simular-economia-cidade" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-navy/60">
+                <label htmlFor="lead-cidade" className="text-sm font-medium text-navy/70">
                   Cidade
                 </label>
                 <input
-                  id="simular-economia-cidade"
+                  id="lead-cidade"
                   name="cidade"
                   type="text"
                   required
                   autoComplete="address-level2"
                   value={cidade}
                   onChange={(e) => setCidade(e.target.value)}
-                  className="w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-sm text-navy placeholder:text-navy/35"
-                  placeholder="Maringá"
+                  className="mt-1.5 w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-navy outline-none transition-colors focus:border-electric"
                 />
               </div>
 
               <div>
-                <label htmlFor="simular-economia-valor-conta" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-navy/60">
+                <label htmlFor="lead-valor-conta" className="text-sm font-medium text-navy/70">
                   Valor médio da conta de luz (R$)
                 </label>
                 <input
-                  id="simular-economia-valor-conta"
+                  id="lead-valor-conta"
                   name="valor_conta"
                   type="number"
                   inputMode="decimal"
@@ -215,22 +232,22 @@ export function SimularEconomiaModal() {
                   required
                   value={valorConta}
                   onChange={(e) => setValorConta(e.target.value)}
-                  className="w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-sm text-navy placeholder:text-navy/35"
+                  className="mt-1.5 w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-navy outline-none transition-colors focus:border-electric"
                   placeholder="350"
                 />
               </div>
 
               <div>
-                <label htmlFor="simular-economia-tipo-imovel" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-navy/60">
+                <label htmlFor="lead-tipo-imovel" className="text-sm font-medium text-navy/70">
                   Tipo de imóvel
                 </label>
                 <select
-                  id="simular-economia-tipo-imovel"
+                  id="lead-tipo-imovel"
                   name="tipo_imovel"
                   required
                   value={tipoImovel}
                   onChange={(e) => setTipoImovel(e.target.value)}
-                  className="w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-sm text-navy"
+                  className="mt-1.5 w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-navy outline-none transition-colors focus:border-electric"
                 >
                   <option value="" disabled>
                     Selecione
@@ -246,9 +263,9 @@ export function SimularEconomiaModal() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="mt-2 rounded-full bg-sun px-6 py-3 text-sm font-semibold text-navy transition-transform hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
+                className="mt-2 w-full rounded-full bg-sun px-6 py-3 text-sm font-semibold text-navy transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {submitting ? 'Enviando...' : 'Continuar no WhatsApp'}
+                {submitting ? 'Enviando…' : 'Simular economia no WhatsApp'}
               </button>
             </form>
           </motion.div>

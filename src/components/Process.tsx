@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { IMAGES } from '../assets/images'
@@ -120,9 +120,88 @@ export function Process() {
       </section>
 
       <div className="lg:hidden">
-        <ProcessStacked />
+        <ProcessMobileCarousel />
       </div>
     </div>
+  )
+}
+
+// Mobile equivalent of the desktop pinned scroll: same number/image/text per
+// step, but driven by a horizontal swipe instead of a vertical scroll-jack —
+// scroll-jacking on touch screens is an explicit anti-pattern per the design
+// direction doc (Section 9), which calls out a horizontal carousel as the
+// sanctioned alternative.
+function ProcessMobileCarousel() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [activeStep, setActiveStep] = useState(0)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const mostVisible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (mostVisible) {
+          setActiveStep(Number((mostVisible.target as HTMLElement).dataset.index))
+        }
+      },
+      { root: container, threshold: [0.5, 0.6, 0.7, 0.8, 0.9] },
+    )
+
+    slideRefs.current.forEach((el) => el && io.observe(el))
+    return () => io.disconnect()
+  }, [])
+
+  return (
+    <section className="bg-navy py-20">
+      <div
+        ref={containerRef}
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 pl-4 pr-14 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {PROCESS_STEPS.map((step, i) => (
+          <div
+            key={step.number}
+            ref={(el) => {
+              slideRefs.current[i] = el
+            }}
+            data-index={i}
+            className="w-[82%] shrink-0 snap-start overflow-hidden rounded-2xl"
+          >
+            <img
+              src={STEP_IMAGES[i]}
+              alt={STEP_ALT[i]}
+              className="h-52 w-full object-cover"
+              loading="lazy"
+            />
+            <div className="pt-5">
+              <span
+                className="text-6xl font-bold leading-none"
+                style={{ WebkitTextStroke: '1.5px rgba(255,253,240,0.4)', color: 'transparent' }}
+              >
+                {step.number}
+              </span>
+              <h3 className="mt-2 text-2xl font-bold text-cream">{step.title}</h3>
+              <p className="mt-3 text-sm text-cream/70">{step.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 flex gap-3 px-4">
+        {PROCESS_STEPS.map((step, i) => (
+          <div key={step.number} className="h-1 flex-1 overflow-hidden rounded-full bg-cream/15">
+            <div
+              className="h-full bg-sun transition-all duration-300"
+              style={{ width: i <= activeStep ? '100%' : '0%' }}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 

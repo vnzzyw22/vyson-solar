@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Logo } from './Logo'
 import { NAV_LINKS } from '../content'
-import { useSimularEconomia } from '../context/SimularEconomiaContext'
+import { useLeadForm } from '../context/LeadFormContext'
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -11,7 +11,7 @@ export function Nav() {
   const [activeHref, setActiveHref] = useState<string | null>(null)
   const location = useLocation()
   const navigate = useNavigate()
-  const { open: openSimularEconomia } = useSimularEconomia()
+  const { open: openLeadForm } = useLeadForm()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -114,7 +114,7 @@ export function Nav() {
         <div className="col-start-3 flex shrink-0 items-center justify-self-end gap-2">
           <button
             type="button"
-            onClick={openSimularEconomia}
+            onClick={openLeadForm}
             className="hidden shrink-0 rounded-full bg-sun px-4 py-2 text-sm font-semibold text-navy transition-transform hover:scale-[1.03] hover:shadow-[0_6px_20px_rgba(255,185,0,0.45)] md:inline-block"
           >
             Simular economia
@@ -161,7 +161,7 @@ export function Nav() {
               type="button"
               onClick={() => {
                 handleLinkClick()
-                openSimularEconomia()
+                openLeadForm()
               }}
               className="mt-1 rounded-full bg-sun px-4 py-2.5 text-center text-sm font-semibold text-navy"
             >

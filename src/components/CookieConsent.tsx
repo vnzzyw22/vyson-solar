@@ -43,7 +43,7 @@ export function CookieConsent() {
           transition={{ duration: 0.3 }}
           role="region"
           aria-label="Aviso de cookies"
-          className="fixed inset-x-4 bottom-20 z-50 mx-auto max-w-xl rounded-2xl border border-navy/10 bg-cream p-5 shadow-[0_12px_40px_rgba(0,35,80,0.18)] sm:bottom-6 sm:p-6 md:inset-x-auto md:right-6"
+          className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-xl rounded-2xl border border-navy/10 bg-cream p-5 shadow-[0_12px_40px_rgba(0,35,80,0.18)] sm:bottom-6 sm:p-6 md:inset-x-auto md:right-6"
         >
           <p className="text-sm text-navy/80">
             Usamos cookies para entender como o site é usado e medir a efetividade de anúncios.

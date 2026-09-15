@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import { Logo } from './Logo'
 import icon from '../assets/logo-vysao/icon.webp'
 import { CONTACT, NAV_LINKS } from '../content'
-import { useSimularEconomia } from '../context/SimularEconomiaContext'
+import { useLeadForm } from '../context/LeadFormContext'
 
 export function CTAFooter() {
-  const { open } = useSimularEconomia()
+  const { open: openLeadForm } = useLeadForm()
 
   return (
     <footer className="relative overflow-hidden bg-navy">
@@ -41,7 +41,7 @@ export function CTAFooter() {
           >
             <button
               type="button"
-              onClick={open}
+              onClick={openLeadForm}
               className="rounded-full bg-sun px-7 py-3.5 text-sm font-semibold text-navy transition-[transform,box-shadow] hover:scale-[1.03] hover:shadow-[0_10px_30px_rgba(255,185,0,0.4)] sm:text-base"
             >
               Simular economia agora

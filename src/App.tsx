@@ -1,18 +1,17 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Nav } from './components/Nav'
-import { MobileCTABar } from './components/MobileCTABar'
 import { CTAFooter } from './components/CTAFooter'
 import { CookieConsent } from './components/CookieConsent'
-import { SimularEconomiaModal } from './components/SimularEconomiaModal'
-import { SimularEconomiaProvider } from './context/SimularEconomiaContext'
+import { LeadFormModal } from './components/LeadFormModal'
+import { LeadFormProvider } from './context/LeadFormContext'
 import { Home } from './pages/Home'
 import { PrivacyPolicy } from './pages/PrivacyPolicy'
 
 function App() {
   return (
     <BrowserRouter>
-      <SimularEconomiaProvider>
-        <div className="pb-16 md:pb-0">
+      <LeadFormProvider>
+        <div>
           <Nav />
           <main>
             <Routes>
@@ -21,11 +20,10 @@ function App() {
             </Routes>
           </main>
           <CTAFooter />
-          <MobileCTABar />
           <CookieConsent />
-          <SimularEconomiaModal />
+          <LeadFormModal />
         </div>
-      </SimularEconomiaProvider>
+      </LeadFormProvider>
     </BrowserRouter>
   )
 }

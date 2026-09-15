@@ -27,31 +27,26 @@ npm run build
 
 ## Deploy
 
-Hospedado na **Netlify** (não tem nada publicado no Vercel — `vercel.json` e os comandos `vercel`
-abaixo ficaram no repo do scaffold inicial, mas não há deploy real lá, só documentado por engano
-numa sessão anterior):
+**Site em produção: https://vysaosolar.netlify.app** (sem hífen entre "vysao" e "solar" — atenção
+pra não confundir com `vysao-solar.netlify.app`, que não existe e dá 404). Project ID
+`7daa4528-ee15-4c5e-9888-dc38504b8f99`, conta `vbcs2009@gmail.com`, time "vbcs2009's team". Público,
+sem proteção de acesso (checado em 2026-09-15 com `curl` — HTTP 200 direto, sem tela de login;
+chegou a ter "Team protection" ativado logo depois de criado, mas foi desativado).
 
-**https://vysao-solar.netlify.app** (project ID `7daa4528-ee15-4c5e-9888-dc38504b8f99`, conta
-`vbcs2009@gmail.com`, time "vbcs2009's team"). Site criado em 2026-09-14 via `netlify-cli` (pra
-contornar uma trava na interface web da Netlify). Não tem `netlify.toml` — o build (`npm run
-build`, publish dir `dist`) foi auto-detectado. **Está com "Team protection" ativado** (recurso da
-própria Netlify, padrão da conta) — a URL pública mostra "This site is private" até alguém
-desativar isso manualmente em app.netlify.com → time → Team settings → Protection (não é
-configurável via CLI).
+Deploy é **manual via CLI**, não é conectado ao GitHub (push não redeploya sozinho — precisa rodar
+os comandos abaixo depois de cada mudança que for pra produção). Não tem `netlify.toml`; o comando
+de build (`npm run build`, publish dir `dist`) foi auto-detectado na primeira vez.
 
 ```bash
-netlify build
-netlify deploy --prod --dir=dist
+npx netlify-cli login              # só na primeira vez / máquina nova
+npx netlify-cli link --id 7daa4528-ee15-4c5e-9888-dc38504b8f99   # idem
+npm run build
+npx netlify-cli deploy --prod --dir=dist
 ```
 
-`vercel.json` já tem o rewrite de SPA que a rota `/politica-de-privacidade` precisaria num deploy
-Vercel (sem isso, acessar a URL direto dá 404) — mantido só para o caso de um dia ser usado, mas
-não reflete o estado real de hospedagem:
-
-```bash
-npx vercel          # deploy de preview (não usado atualmente)
-npx vercel --prod    # deploy de produção (não usado atualmente)
-```
+Também existe `vercel.json` no repo (rewrite de SPA pra `/politica-de-privacidade` não dar 404),
+preparado caso decidam migrar ou espelhar no Vercel no futuro — mas isso **nunca foi publicado**;
+não confundir com um site real. Se for usado: `npx vercel --prod`.
 
 ## Simulador de economia
 
@@ -66,20 +61,22 @@ faixa de conta são chutes plausíveis, não uma proposta real. O CTA da seção
 WhatsApp com os valores simulados na mensagem (não passa pelo modal de lead abaixo).
 
 **Importante — o CTA "Simular economia" não se comporta igual em todo lugar do site**: no Hero ele
-agora só rola suavemente até essa seção (`<a href="/#simulador">`, sem abrir modal); em Nav,
-`MobileCTABar` e `CTAFooter` ele continua abrindo o modal de lead (próxima seção abaixo). Foi
-assim que o cliente pediu — se um dia perguntar "por que o botão faz coisas diferentes", a
-resposta é essa, não é inconsistência left over.
+agora só rola suavemente até essa seção (`<a href="/#simulador">`, sem abrir modal); em Nav e
+`CTAFooter` ele continua abrindo o modal de lead (próxima seção abaixo). Foi assim que o cliente
+pediu — se um dia perguntar "por que o botão faz coisas diferentes", a resposta é essa, não é
+inconsistência leftover. (Não existe mais `MobileCTABar` — foi removido numa sessão paralela pra
+resolver espaçamento da seção Serviços no mobile; não recriar sem pedido explícito.)
 
 ## Captura de lead (Netlify Forms)
 
-O CTA "Simular economia" do Nav, `MobileCTABar` e `CTAFooter` (não o do Hero, ver acima) abre um
-modal (`src/components/SimularEconomiaModal.tsx`, estado global via
-`src/context/SimularEconomiaContext.tsx`) pedindo **nome, telefone, cidade, valor médio da conta
-de luz (R$) e tipo de imóvel (Residencial/Comercial/Rural)** antes de redirecionar pro WhatsApp —
-sem Supabase, sem backend próprio, usando **Netlify Forms**. Funciona no site real (Netlify,
-acima). Só pararia de funcionar se o site fosse publicado em outro lugar sem suporte a Netlify
-Forms (Vercel, por exemplo, não processaria o POST) — não é o caso hoje.
+O CTA "Simular economia" do Nav e `CTAFooter` (não o do Hero, ver acima) abre um modal
+(`src/components/LeadFormModal.tsx`, estado global via `src/context/LeadFormContext.tsx`) pedindo
+**nome, telefone, cidade, valor médio da conta de luz (R$) e tipo de imóvel
+(Residencial/Comercial/Rural)** antes de redirecionar pro WhatsApp — sem Supabase, sem backend
+próprio, usando **Netlify Forms**. Tem honeypot anti-spam (`bot-field`, via
+`data-netlify-honeypot`), trava o scroll do body e prende o foco/Escape enquanto aberto. Funciona
+no site real (Netlify, acima). Só pararia de funcionar se o site fosse publicado em outro lugar
+sem suporte a Netlify Forms (Vercel, por exemplo, não processaria o POST) — não é o caso hoje.
 
 A mensagem final do WhatsApp segue um formato fixo definido em `buildWhatsappMessage`:
 
@@ -93,14 +90,15 @@ Tenho interesse em simular economia com energia solar.
 ```
 
 Como funciona:
-- `index.html` tem um `<form name="simular-economia" data-netlify="true" hidden>` estático com os
-  mesmos campos do modal — é assim que o Netlify detecta o formulário no build (ele lê o HTML
-  gerado, não executa JS, então um form só-React não seria encontrado).
-- No submit do modal, faz um `fetch('/', { method: 'POST', ... })` com
-  `Content-Type: application/x-www-form-urlencoded` antes de redirecionar. Se falhar (rede ou
-  status não-OK), loga no console e redireciona pro WhatsApp mesmo assim — nunca trava o usuário.
-- A aba do WhatsApp é aberta de forma síncrona (`window.open` logo no clique, antes do `await` do
-  fetch) para não ser bloqueada como pop-up pelo navegador; a URL final é só preenchida depois.
+- `index.html` tem um `<form name="simular-economia" data-netlify="true" data-netlify-honeypot="bot-field" hidden>`
+  estático com os mesmos campos do modal (incluindo o honeypot) — é assim que o Netlify detecta o
+  formulário no build (ele lê o HTML gerado, não executa JS, então um form só-React não seria
+  encontrado). **Se adicionar/renomear campo no modal, espelhar aqui também.**
+- No submit do modal, abre a aba do WhatsApp de forma síncrona (`window.open` logo no clique,
+  antes do `await` do fetch — senão o navegador bloqueia como pop-up) e só depois faz o
+  `fetch('/', { method: 'POST', ... })` com `Content-Type: application/x-www-form-urlencoded`. Se
+  falhar (rede ou status não-OK), loga no console e redireciona pro WhatsApp mesmo assim — nunca
+  trava o usuário.
 
 Onde ver os leads enviados: painel da Netlify → site → aba **Forms**.
 
@@ -125,9 +123,10 @@ no futuro, podem substituir os cutouts diretamente sem mudar o código dos compo
 ## SEO / Analytics / LGPD
 
 - Meta tags Open Graph/Twitter, `robots.txt`, `sitemap.xml` e JSON-LD (`LocalBusiness`) já
-  configurados em `index.html` — todos com **TODO marcado no próprio arquivo** apontando pra URL
-  temporária da Netlify; trocar pelo domínio final quando o DNS de `vysaosolar.com.br` for
-  apontado (são 3 arquivos: `index.html`, `public/robots.txt`, `public/sitemap.xml`).
+  configurados em `index.html`, apontando pra URL real em produção
+  (`https://vysaosolar.netlify.app`) — todos com **TODO marcado no próprio arquivo**; trocar pelo
+  domínio final quando o DNS de `vysaosolar.com.br` for apontado (são 3 arquivos: `index.html`,
+  `public/robots.txt`, `public/sitemap.xml`).
 - Imagem de compartilhamento (`public/og-image.jpg`, 1200×630, com logo e headline) já gerada e
   referenciada em `og:image`/`twitter:image` — confirmado que a prévia com imagem funciona ao
   compartilhar o link (WhatsApp etc. lêem essas meta tags).
@@ -162,7 +161,6 @@ no futuro, podem substituir os cutouts diretamente sem mudar o código dos compo
 - Criar as contas Google Analytics / Meta Pixel e trocar os IDs placeholder.
 - Testar em iPhone real (Safari) — GSAP ScrollTrigger e o `backdrop-blur` da nav têm histórico de
   comportamento diferente no Safari.
-- Se quiser o site Netlify público sem login, desativar "Team protection" (ver seção Deploy acima).
 
 ## Log de decisões técnicas recentes (2026-09-14)
 
@@ -198,8 +196,8 @@ no futuro, podem substituir os cutouts diretamente sem mudar o código dos compo
 - **Correção Vercel → Netlify**: o README e as meta tags/`robots.txt`/`sitemap.xml` chegaram a
   documentar o Vercel como hospedagem "principal" e a Netlify como "espelho" — isso estava errado,
   nunca existiu deploy real no Vercel (só `vercel.json` de scaffold inicial). Netlify
-  (`vysao-solar.netlify.app`) é o único deploy real; todas as URLs foram corrigidas.
-- **Captura de lead**: adicionados 2 campos ao `SimularEconomiaModal` — "valor médio da conta de
+  (`vysaosolar.netlify.app`, sem hífen) é o único deploy real; todas as URLs foram corrigidas.
+- **Captura de lead**: adicionados 2 campos ao `LeadFormModal` — "valor médio da conta de
   luz" (`valor_conta`, numérico) e "tipo de imóvel" (`tipo_imovel`, select Residencial/Comercial/
   Rural). Mensagem final do WhatsApp segue formato fixo com emojis (ver seção "Captura de lead"
   acima) — não é só uma listagem simples de campos, é um texto específico pedido pelo cliente, não
@@ -212,6 +210,17 @@ no futuro, podem substituir os cutouts diretamente sem mudar o código dos compo
 - **Seção "Simulador de economia"** (`EconomiaSimulator.tsx`, `id="simulador"`) adicionada entre
   Hero e Sobre — ver seção própria acima. CTA do Hero mudou de "abre modal de lead" para "rola até
   o simulador"; os outros CTAs "Simular economia" do site continuam abrindo o modal.
+- **Reconciliação de trabalho paralelo**: nesse mesmo dia, outra sessão (outra máquina, mesma
+  conta) trabalhou no repo em paralelo e chegou a implementar sua própria versão da captura de
+  lead (`LeadFormModal`/`LeadFormContext`, com honeypot anti-spam, scroll-lock e Escape pra
+  fechar), removeu o `MobileCTABar` (ajuste de espaçamento mobile da seção Serviços), refez a
+  seção Processo como carrossel no mobile e mudou fontes de títulos (Services/Process/Cases). Ao
+  dar `git push`, os commits divergiram — resolvido via `git merge` (não `reset`/`rebase`, pra não
+  descartar nada de nenhum dos dois lados): a versão deles do formulário de lead venceu (nomes
+  `LeadForm*`), só recebeu os 2 campos novos e a correção do popup-blocker por cima; o
+  `EconomiaSimulator.tsx` e a restrição do vídeo no mobile (exclusivos desta sessão) foram
+  mantidos. **Lição:** com duas sessões/máquinas ativas na mesma conta, sempre `git fetch` +
+  conferir `git log origin/main` antes de presumir que `git push` vai ser um fast-forward direto.
 
 Ver `VYSAO-SOLAR-DESIGN-DIRECTION.md` na raiz do repositório para o documento completo de direção
 de design e critérios de aprovação.
