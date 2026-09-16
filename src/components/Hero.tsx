@@ -8,8 +8,8 @@ export function Hero() {
   return (
     <section id="top" className="relative flex h-[92svh] min-h-[560px] w-full items-end overflow-hidden sm:h-[100svh]">
       <HeroBackground />
-      <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/55 to-navy/5" />
-      <div className="absolute inset-0 bg-gradient-to-r from-navy/70 via-navy/10 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/35 to-navy/5" />
+      <div className="absolute inset-0 bg-gradient-to-r from-navy/50 via-navy/8 to-transparent" />
 
       <div className="relative z-10 w-full px-4 pb-16 sm:px-8 sm:pb-24 lg:px-12">
         <div className="mx-auto max-w-6xl">

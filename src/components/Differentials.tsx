@@ -1,15 +1,13 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { IMAGES } from '../assets/images'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { useLeadForm } from '../context/LeadFormContext'
 
-// Fotos que ficam alternando (crossfade) atrás dos cards. Por padrão reaproveita
-// as 3 imagens de serviço/case já existentes no projeto. Se novas fotos forem
-// adicionadas (ex: coloque o arquivo em src/assets/images/ e importe aqui, ou
-// aponte pra um arquivo em public/), é só empurrar mais entradas neste array —
-// o carrossel de fundo se ajusta sozinho pra qualquer quantidade de imagens.
-const BACKGROUND_IMAGES: string[] = [IMAGES.residencial, IMAGES['comercial-industrial'], IMAGES.rural]
+// Fotos que ficam alternando (crossfade) atrás dos cards — fornecidas pelo
+// cliente (public/diferenciais-1.jpg, -2.jpg, -3.jpg). Pra trocar/adicionar,
+// é só apontar pro arquivo novo em public/ e empurrar mais entradas neste
+// array — o carrossel de fundo se ajusta sozinho pra qualquer quantidade.
+const BACKGROUND_IMAGES: string[] = ['/diferenciais-1.jpg', '/diferenciais-2.jpg', '/diferenciais-3.jpg']
 
 const BACKGROUND_INTERVAL_MS = 6000
 

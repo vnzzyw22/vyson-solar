@@ -6,6 +6,12 @@ import { whatsappLink } from '../content'
 
 const TIPOS_IMOVEL = ['Residencial', 'Comercial', 'Rural']
 
+function formatTelefone(digits: string) {
+  if (digits.length === 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+  if (digits.length === 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  return digits
+}
+
 function buildWhatsappMessage({
   nome,
   telefone,
@@ -24,7 +30,7 @@ function buildWhatsappMessage({
     `Tenho interesse em simular economia com energia solar.\n\n` +
     `📍 Tipo de imóvel: ${tipoImovel}\n` +
     `💡 Valor médio da conta de luz: R$ ${valorConta}\n` +
-    `📱 Telefone de contato: ${telefone}`
+    `📱 Telefone de contato: ${formatTelefone(telefone)}`
   )
 }
 
@@ -67,7 +73,11 @@ export function LeadFormModal() {
     // Precisa abrir a aba SINCRONAMENTE aqui, ainda dentro do gesto de clique —
     // se abrirmos só depois do fetch (await), o navegador trata como popup não
     // solicitado e bloqueia (acontece mesmo no Chrome, não só Safari).
-    const whatsappTab = window.open('', '_blank', 'noopener,noreferrer')
+    // IMPORTANTE: sem "noopener"/"noreferrer" aqui — com qualquer um dos dois,
+    // vários navegadores retornam null em vez da referência da aba, e a gente
+    // perde a capacidade de mandar ela pro WhatsApp depois do fetch (ela fica
+    // parada em about:blank pra sempre).
+    const whatsappTab = window.open('', '_blank')
 
     try {
       const res = await fetch('/api/leads', {
@@ -185,12 +195,16 @@ export function LeadFormModal() {
                   id="lead-telefone"
                   name="telefone"
                   type="tel"
-                  inputMode="tel"
+                  inputMode="numeric"
                   required
                   autoComplete="tel"
-                  placeholder="(44) 9XXXX-XXXX"
+                  placeholder="44988887777"
+                  minLength={10}
+                  maxLength={11}
+                  pattern="[0-9]{10,11}"
+                  title="Digite o telefone só com números, com DDD (10 ou 11 dígitos)"
                   value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
+                  onChange={(e) => setTelefone(e.target.value.replace(/\D/g, '').slice(0, 11))}
                   className="mt-1.5 w-full rounded-xl border border-navy/15 bg-white px-4 py-2.5 text-navy outline-none transition-colors focus:border-electric"
                 />
               </div>
